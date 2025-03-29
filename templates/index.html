@@ -97,10 +97,7 @@
             <div class="form-group">
                 <label for="style">Select Ghibli Style:</label>
                 <select id="style">
-                    <option value="Spirited Away">Spirited Away</option>
-                    <option value="Courtsy">Courtsy</option>
-                    <option value="Princess Mononoke">Princess Mononoke</option>
-                    <option value="Howl's Moving Castle">Howl's Moving Castle</option>
+                    <!-- Styles will be dynamically populated via JavaScript -->
                 </select>
             </div>
             <button id="convert">Convert Image</button>
@@ -119,6 +116,16 @@
 
     <!-- Embedded JavaScript -->
     <script>
+        // Dynamically populate the style dropdown
+        const styles = {{ ghibli_styles | tojson }};
+    const styleDropdown = document.getElementById('style');
+    for (const style in styles) {
+        const option = document.createElement('option');
+        option.value = style;
+        option.textContent = style;
+        styleDropdown.appendChild(option);
+    }
+
         document.getElementById('convert').addEventListener('click', async () => {
             const contentFile = document.getElementById('content').files[0];
             const style = document.getElementById('style').value;

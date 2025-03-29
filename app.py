@@ -55,18 +55,20 @@ def load_image(image_path, max_dim=512):
 # Function to dynamically fetch styles from GitHub
 def get_github_styles(github_repo_url):
     # Replace with your GitHub repository URL
-    github_api_url = f"{github_repo_url}/contents/styles"
+    github_api_url = f"{github_repo_url}/contents"
     response = requests.get(github_api_url)
     if response.status_code == 200:
         contents = json.loads(response.text)
         ghibli_styles = {}
         for item in contents:
-            if item['type'] == 'file':
+            if item['type'] == 'file' and item['name'].endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp')):
                 filename = item['name']
                 raw_url = item['download_url']
                 ghibli_styles[filename] = raw_url
         return ghibli_styles
     else:
+        print(f"Failed to fetch styles from GitHub. Status code: {response.status_code}")
+        print(f"Response Content: {response.text}")  # Debugging
         raise ValueError(f"Failed to fetch styles from GitHub. Status code: {response.status_code}")
 
 # Predefined Ghibli-style images (High-quality URLs)
@@ -76,7 +78,7 @@ ghibli_styles = get_github_styles(GITHUB_REPO_URL)
 @app.route('/')
 def home():
     # Render the index.html template
-    return render_template('index.html')
+    return render_template('index.html',ghibli_styles=ghibli_styles)
 
 @app.route('/upload', methods=['POST'])
 def upload():

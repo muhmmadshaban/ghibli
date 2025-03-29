@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghibli Style Converter</title>
+
+    <!-- Embedded CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        input[type="file"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .result img {
+            max-width: 100%;
+            height: auto;
+        }
+        .success-message {
+            color: green;
+            margin-top: 10px;
+        }
+        .download-button {
+            margin-top: 10px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .download-button:hover {
+            background-color: #218838;
+        }
+        #loader {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #loader img {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ghibli Style Converter</h1>
+        <div id="app">
+            <div class="form-group">
+                <label for="content">Upload Content Image:</label>
+                <input type="file" id="content" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label for="style">Select Ghibli Style:</label>
+                <select id="style">
+                    <option value="Spirited Away">Spirited Away</option>
+                    <option value="Courtsy">Courtsy</option>
+                    <option value="Princess Mononoke">Princess Mononoke</option>
+                    <option value="Howl's Moving Castle">Howl's Moving Castle</option>
+                </select>
+            </div>
+            <button id="convert">Convert Image</button>
+
+            <!-- Loading Indicator -->
+            <div id="loader" style="display: none;">
+                <img src="https://i.imgur.com/5vK4Ah3.gif" alt="Loading..." style="width: 50px; margin-top: 20px;">
+                <p>Loading...</p>
+            </div>
+
+            <div class="result" id="result"></div>
+            <div class="success-message" id="successMessage"></div>
+            <button id="downloadButton" class="download-button" style="display: none;">Download Stylized Image</button>
+        </div>
+    </div>
+
+    <!-- Embedded JavaScript -->
+    <script>
+        document.getElementById('convert').addEventListener('click', async () => {
+            const contentFile = document.getElementById('content').files[0];
+            const style = document.getElementById('style').value;
+
+            if (!contentFile) {
+                alert('Please upload a content image.');
+                return;
+            }
+
+            // Show loading indicator
+            document.getElementById('loader').style.display = 'block';
+
+            // Create FormData object
+            const formData = new FormData();
+            formData.append('content', contentFile);
+            formData.append('style', style);
+
+            // Send POST request to backend
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            // Hide loading indicator
+            document.getElementById('loader').style.display = 'none';
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+
+                // Display stylized image
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<img src="${url}" alt="Stylized Image">`;
+
+                // Show success message
+                const successMessage = document.getElementById('successMessage');
+                successMessage.textContent = 'Style transfer completed successfully!';
+                successMessage.style.display = 'block';
+
+                // Enable download button
+                const downloadButton = document.getElementById('downloadButton');
+                downloadButton.href = url;
+                downloadButton.download = 'stylized_image.jpg';
+                downloadButton.style.display = 'inline-block';
+            } else {
+                const error = await response.json();
+                alert(error.error);
+            }
+        });
+    </script>
+</body>
+</html>

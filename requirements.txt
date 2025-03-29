@@ -1,7 +1,9 @@
+
 Flask
-tensorflow==2.12.0  # Specify a compatible version
+tensorflow==2.12.0  # or another compatible version
 tensorflow-hub
 numpy
 Pillow
 matplotlib
 requests
+gunicorn

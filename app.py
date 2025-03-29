@@ -13,7 +13,7 @@ import json
 app = Flask(__name__)
 
 # Configure upload folder
-UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -77,8 +77,8 @@ ghibli_styles = get_github_styles(GITHUB_REPO_URL)
 
 @app.route('/')
 def home():
-    # Render the index.html template
-    return render_template('index.html',ghibli_styles=ghibli_styles)
+    # Pass ghibli_styles to the template
+    return render_template('index.html', ghibli_styles=ghibli_styles)
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -143,6 +143,19 @@ def upload():
 
     # Return stylized image
     return send_file(stylized_path, mimetype='image/jpeg')
+
+@app.route('/download')
+def download():
+    # Path to the stylized image
+    stylized_path = os.path.join(app.config['UPLOAD_FOLDER'], 'stylized_image.jpg')
+    
+    # Check if the file exists
+    if not os.path.exists(stylized_path):
+        return jsonify({'error': 'Stylized image not found.'}), 404
+    
+    # Send the file for download
+    return send_file(stylized_path, mimetype='image/jpeg', as_attachment=True, download_name='stylized_image.jpg')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,10 +1,9 @@
-
-Flask
-tensorflow==2.12.0  # or another compatible version
+Flask==2.2.3
+tensorflow==2.12.0
 tensorflow-hub
 numpy
 Pillow
 matplotlib
 requests
 gunicorn
-gevent 
+gevent
